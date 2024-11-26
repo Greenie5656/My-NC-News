@@ -85,7 +85,6 @@ describe("GET /api/articles", () => {
     .get("/api/articles")
     .expect(200)
     .then(({ body }) => {
-      console.log(body)
       const { articles } = body;
       expect(articles).toBeInstanceOf(Array);
       expect(articles).toHaveLength(13);
@@ -115,3 +114,34 @@ describe("GET /api/articles", () => {
     });
   });
 
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: responds with an array of comments for the given article_id", () => {
+    return request (app)
+    .get ("/api/articles/1/comments")
+    .expect(200)
+    .then(({ body }) => {
+      const { comments } = body;
+      expect(comments).toBeInstanceOf(Array);
+      comments.forEach((comment) => {
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          article_id: 1
+        });
+      });
+      expect(comments).toBeSortedBy("created_at", { descending: true });
+    });
+  });
+  test("200: responds with empty array when article has no comments", () => {
+    return request (app)
+    .get("/api/articles/2/comments")
+    .expect(200)
+    .then(({ body}) => {
+      const { comments } = body;
+      expect(comments).toEqual([]);
+    })
+  })
+})
