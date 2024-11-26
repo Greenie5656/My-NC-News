@@ -34,3 +34,20 @@ exports.selectArticleComments = (article_id) => {
         .then(({ rows }) => rows);
     };
 
+exports.insertComment = (article_id, comment) => {
+    const { username, body } = comment;
+    const text = "INSERT INTO comments (body, author, article_id, votes, created_at) VALUES ($1, $2, $3, 0, NOW()) RETURNING *"
+    const values =[body, username, article_id];
+    console.log(values)
+    if (!username || !body){
+        return Promise.reject({ status: 400, msg: "Missing required fields"})
+    }
+
+
+    return exports.selectArticleId(article_id)
+        .then(() => {
+            return db.query(text, values)
+        })
+        .then(({ rows }) => rows[0]);
+    };
+

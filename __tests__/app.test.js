@@ -144,4 +144,49 @@ describe("GET /api/articles/:article_id/comments", () => {
       expect(comments).toEqual([]);
     })
   })
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: responds with comment", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "This is a mew comment"
+    };
+    return request(app)
+    .post("/api/articles/1/comments")
+    .send(newComment)
+    .expect(201)
+    .then(({ body }) => {
+      const { comment } = body;
+      expect(comment.body).toBe("This is a mew comment")
+      expect(comment.author).toBe("butter_bridge")
+    })
+  });
+  test("404: responds with error when article does not exist", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "This is a mew comment"
+    };
+    return request(app)
+    .post("/api/articles/5656/comments")
+    .send(newComment)
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Article not found")
+    })
+  });
+  test("400: responds with error when missing required fields", () => {
+    const newComment = {
+      username: "butter_bridge",
+
+    };
+    return request(app)
+    .post("/api/articles/1/comments")
+    .send(newComment)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Missing required fields")
+    });
+  });
+
 })
