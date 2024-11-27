@@ -280,4 +280,29 @@ describe("PATCH /api/articles/:article_id", () => {
   })
 })
 
-///forgot to add branch
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: deletes the comment", () => {
+    return request(app)
+    .delete("/api/comments/1")
+    .expect(204)
+    .then(({ body }) => {
+      expect(body).toEqual({});
+    });
+  });
+  test("404: responds with error when comment does not exist", () => {
+    return request (app)
+    .delete("/api/comments/5656")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Comment not found");
+    })
+  })
+  test("400: responds with error when comment_id is invalid", () => {
+    return request(app)
+    .delete("/api/comments/not-a-comment")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Invalid comment id");
+    });
+  });
+})
