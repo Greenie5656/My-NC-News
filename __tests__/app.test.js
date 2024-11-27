@@ -143,7 +143,23 @@ describe("GET /api/articles/:article_id/comments", () => {
       const { comments } = body;
       expect(comments).toEqual([]);
     })
-  })
+  });
+  test("404: responds with relevant response for an id that does not exist", () => {
+    return request (app)
+    .get("/api/articles/565656/comments")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Article not found");
+    });
+  });
+  test("400: responds with a response for invalid id", () => {
+    return request (app)
+    .get("/api/articles/not-an-id/comments")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Invalid article id");
+    });
+  });
 });
 
 describe("POST /api/articles/:article_id/comments", () => {

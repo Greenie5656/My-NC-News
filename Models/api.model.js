@@ -25,6 +25,9 @@ exports.selectArticles = () => {
 }
 
 exports.selectArticleComments = (article_id) => {
+    if (!article_id) {
+        return Promise.reject({status: 400, msg: "Invalid article id"})
+    }
     const text = "SELECT comment_id, votes, created_at, author, body, article_id FROM comments WHERE article_id = $1 ORDER BY created_at DESC";
     const values = [article_id];
     return exports.selectArticleId(article_id)
@@ -38,7 +41,7 @@ exports.insertComment = (article_id, comment) => {
     const { username, body } = comment;
     const text = "INSERT INTO comments (body, author, article_id, votes, created_at) VALUES ($1, $2, $3, 0, NOW()) RETURNING *"
     const values =[body, username, article_id];
-    console.log(values)
+    // console.log(values)
     if (!username || !body){
         return Promise.reject({ status: 400, msg: "Missing required fields"})
     }
