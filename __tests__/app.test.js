@@ -204,5 +204,78 @@ describe("POST /api/articles/:article_id/comments", () => {
       expect(body.msg).toBe("Missing required fields")
     });
   });
-
+});
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: responds with updated article when votes are added", () => {
+    const voteUpdate = { inc_votes: 1};
+    return request (app)
+    .patch("/api/articles/1")
+    .send(voteUpdate)
+    .expect(200)
+    .then(({ body }) => {
+      const {article} = body;
+      expect(article).toMatchObject({
+        article_id: 1,
+        title: expect.any(String),
+        topic: expect.any(String),
+        author: expect.any(String),
+        body: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        article_img_url: expect.any(String)
+      });
+      expect(article.votes).toBe(101);
+    })
+  })
+  test("200: responds correctly when votes are decremented", () => {
+    const voteUpdate = { inc_votes: -100 };
+    return request(app)
+    .patch("/api/articles/1")
+    .send(voteUpdate)
+    .expect(200)
+    .then(({ body }) => {
+      const {article} = body;
+      expect(article.votes).toBe(0);
+    });
+  });
+  test("404: responds with error when article does not exist", () => {
+    const voteUpdate = { inc_votes: 1 };
+    return request(app)
+    .patch("/api/articles/5656")
+    .send(voteUpdate)
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Article not found");
+    });
+  });
+  test("400: responds with error when article_id is invalid", () => {
+    const voteUpdate = { inc_votes: 1 };
+    return request(app)
+    .patch("/api/articles/not-an-id")
+    .send(voteUpdate)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Invalid article id");
+    })
+  })
+  test("400: responds with error when empty", () => {
+    const voteUpdate = {};
+    return request(app)
+    .patch("/api/articles/1")
+    .send(voteUpdate)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Missing inc_votes in request body");
+    });
+  });
+  test("400: responds with error when inc_votes is not a number", () => {
+    const voteUpdate = { inc_votes: "not a number"};
+    return request(app)
+    .patch("/api/articles/1")
+    .send(voteUpdate)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Invalid inc_votes value")
+    })
+  })
 })

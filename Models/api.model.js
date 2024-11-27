@@ -54,3 +54,22 @@ exports.insertComment = (article_id, comment) => {
         .then(({ rows }) => rows[0]);
     };
 
+exports.updateArticleVotes = (article_id, inc_votes) => {
+    if (!inc_votes){
+        return Promise.reject({ status: 400, msg: "Missing inc_votes in request body"})
+    }
+    if (typeof inc_votes !== "number"){
+        return Promise.reject({ status: 400, msg: "Invalid inc_votes value"});
+    }
+    const text = "UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;";
+    const values = [inc_votes, article_id];
+
+    return db.query(text, values)
+    .then (({ rows }) => {
+        if (rows.length === 0){
+            return Promise.reject({ status: 404, msg: "Article not found"});
+        }
+        return rows[0];
+    })
+}
+
