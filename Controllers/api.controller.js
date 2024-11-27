@@ -50,8 +50,7 @@ exports.getArticleComments = (req, res, next) => {
 }
 
 exports.postComment = (req, res, next) => {
-    console.log("req.body", req.body)
-    console.log("req.params", req.params)
+
     const { article_id } = req.params;
     const comment = req.body;
     insertComment(article_id, comment)
