@@ -306,3 +306,30 @@ describe("DELETE /api/comments/:comment_id", () => {
     });
   });
 })
+describe("GET /api/users", () => {
+  test("200: responds with an array of user objects", () => {
+    return request (app)
+    .get("/api/users")
+    .expect(200)
+    .then(({ body }) => {
+      const { users } = body;
+      expect(users).toBeInstanceOf(Array);
+      expect(users.length).toBeGreaterThan(0);
+      users.forEach((user) => {
+        expect(user).toMatchObject({
+        username: expect.any(String),
+        name: expect.any(String),
+        avatar_url: expect.any(String)
+      });
+    });
+  });
+});
+  test("404: responds with error for wrong path", () => {
+    return request(app)
+    .get("/api/userss")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Not Found");
+    });
+  })
+});
