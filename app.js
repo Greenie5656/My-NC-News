@@ -1,6 +1,6 @@
 const express = require('express');
-const { getApi, getTopics, getArticleId, getArticles, getArticleComments, postComment, patchArticleVotes, deleteComment, getUsers } = require("../be-nc-news/Controllers/api.controller")
-const { errorHandler } = require("../be-nc-news/error-handlers");
+const { getApi, getTopics, getArticleId, getArticles, getArticleComments, postComment, patchArticleVotes, deleteComment, getUsers } = require("./Controllers/api.controller")
+const { errorHandler } = require("./error-handlers");
 
 const app = express();
 
@@ -23,6 +23,7 @@ app.patch("/api/articles/:article_id", patchArticleVotes);
 app.delete("/api/comments/:comment_id", deleteComment);
 
 app.get ("/api/users", getUsers);
+
 
 app.all("*", (reg, res) => {
     res.status(404).send({ msg: "Not Found"});
