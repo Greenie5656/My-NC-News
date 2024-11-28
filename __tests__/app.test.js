@@ -432,3 +432,24 @@ describe("GET /api/articles - topic query", () => {
     })
   });
 });
+
+describe("GET /api/articles/:article_id - comment_count", () => {
+  test("200: counts comments on a specified article_id", () => {
+    return request(app)
+    .get("/api/articles/1")
+    .expect(200)
+    .then(({ body }) => {
+      const { article } = body;
+      expect(article.comment_count).toBe(11)
+    })
+  })
+  test("200: article with no comments has zero count", () => {
+    return request(app)
+    .get("/api/articles/2")
+    .expect(200)
+    .then(({ body}) => {
+      const { article } = body;
+      expect(article.comment_count).toBe(0);
+    })
+  })
+});

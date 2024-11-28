@@ -7,7 +7,14 @@ exports.selectTopics = () => {
 }
 
 exports.selectArticleId = (article_id) => {
-const text = "SELECT * FROM articles WHERE article_id = $1";
+const text = `
+        SELECT articles.*,
+        COALESCE(COUNT(comments.comment_id), 0)::INTEGER AS comment_count
+        FROM articles 
+        LEFT JOIN comments ON articles.article_id = comments.article_id
+        WHERE articles.article_id = $1
+        GROUP BY articles.article_id;
+    `;
 const values = [article_id];
     return db.query(text, values)
     .then(({ rows }) => {
