@@ -399,3 +399,36 @@ describe("GET /api/articles - sorting queries", () => {
     });
   });
 });
+
+describe("GET /api/articles - topic query", () => {
+  test("200: filters articles ny the specified topic", () => {
+    return request(app)
+  .get("/api/articles?topic=cats")
+  .expect(200)
+  .then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(1);
+    articles.forEach((article) => {
+      expect(article.topic).toBe("cats");
+    });
+  });
+  });
+  test("200: returns all articles when no topic is specified", () => {
+    return request(app)
+    .get("/api/articles")
+    .expect(200)
+    .then(({ body }) => {
+      const { articles } = body;
+      expect(articles).toHaveLength(13);
+    })
+  })
+  test("200: returns an empty array for a topic with no articles", () => {
+    return request(app)
+    .get("/api/articles?topic=paper")
+    .expect(200)
+    .then(({ body }) => {
+      const { articles } = body;
+      expect(articles).toEqual([]);
+    })
+  });
+});

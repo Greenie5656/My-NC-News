@@ -18,7 +18,7 @@ const values = [article_id];
     })
 }
 
-exports.selectArticles = (sort_by = "created_at", order = "desc") => {
+exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
 
     const validColumns = [
         'author',
@@ -35,15 +35,26 @@ exports.selectArticles = (sort_by = "created_at", order = "desc") => {
     if (!validColumns.includes(sort_by)){
         return Promise.reject({ status: 400, msg: "Invalid sort_by query"});
     }
+
+        
     if (!validOrders.includes(order.toLowerCase())){
         return Promise.reject({ status: 400, msg: "Invalid order query"});
     }
 
-    const queryStr = `SELECT articles.author, articles.title, articles.article_id, 
-    articles.topic, articles.created_at, articles.votes, articles.article_img_url,COUNT(comments.comment_id)::INTEGER AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`
+    let queryStr = `SELECT articles.author, articles.title, articles.article_id, 
+    articles.topic, articles.created_at, articles.votes, articles.article_img_url,COUNT(comments.comment_id)::INTEGER AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`
+
+    const queryValues =[];
+
+    if (topic){
+        queryStr += ` WHERE articles.topic = $1`;
+        queryValues.push(topic);
+    }
+
+    queryStr+= ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
 
     return db
-    .query(queryStr)
+    .query(queryStr, queryValues)
     .then (({ rows }) => rows);
 }
 
