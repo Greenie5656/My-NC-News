@@ -134,3 +134,18 @@ exports.selectUsers = () => {
     .then(({ rows }) => rows );
 };
 
+exports.selectUserByUsername = (username) => {
+
+    const text = "SELECT * FROM users WHERE username = $1;";
+    const values = [username]
+    return db.query( text, values)
+    .then(({ rows }) => {
+        if (rows.length === 0) {
+            return Promise.reject({
+                status: 404, msg: "User not found"
+            });
+        }
+        return rows[0];
+    })
+}
+

@@ -453,3 +453,29 @@ describe("GET /api/articles/:article_id - comment_count", () => {
     })
   })
 });
+
+describe("GET /api/users/:username", () => {
+  test("200: responds with a user object containing name, avatar_url and usewrname", () => {
+    return request(app)
+    .get("/api/users/butter_bridge")
+    .expect(200)
+    .then(({ body }) => {
+      const { user } = body;
+      expect(user).toMatchObject({
+        username: "butter_bridge",
+        avatar_url: expect.any(String),
+        name: expect.any(String)
+
+      })
+    })
+  })
+  test("404: responds with msg when user does not exist", () => {
+    return request(app)
+    .get("/api/users/not_a_username")
+    .expect(404)
+    .then(({ body }) => {
+      const { msg } = body;
+      expect(msg).toBe("User not found");
+    })
+  })
+})
