@@ -479,3 +479,50 @@ describe("GET /api/users/:username", () => {
     })
   })
 })
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("200: responds with updated coment when votes are added", () => {
+    return request(app)
+    .patch("/api/comments/1")
+    .send({ inc_votes: 1})
+    .expect(200)
+    .then(({ body}) => {
+      const { comment } = body;
+      expect(comment).toMatchObject({
+        comment_id: 1,
+        votes: expect.any(Number),
+        author: expect.any(String),
+        body:expect.any(String)
+      });
+      expect(comment.votes).toBe(17);
+    });
+  });
+  test("200: responds with updated comment when votes are decremented", () => {
+    return request(app)
+    .patch("/api/comments/1")
+    .send({ inc_votes: -1 })
+    .expect(200)
+    .then(({ body}) => {
+      const { comment } =  body;
+      expect(comment.votes).toBe(15);
+    })
+  });
+  test("404: responds with error when comment does not exist", () => {
+    return request(app)
+    .patch("/api/comments/5656")
+    .send({ inc_votes: 1 })
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Comment not found");
+    })
+  })
+  test('400: responds with error when comment_id is invalid', () => {
+    return request(app)
+    .patch('/api/comments/not_an_id')
+    .send({ inc_votes: 1 })
+    .expect(400)
+    .then(({ body }) => {
+        expect(body.msg).toBe('Invalid comment id');
+    });
+});
+})
